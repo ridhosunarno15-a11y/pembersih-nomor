@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Extractor Nomor Pro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-900 text-white min-h-screen p-4 flex flex-col items-center">
+    <div class="max-w-md w-full bg-slate-800 p-6 rounded-2xl shadow-xl mt-10 border border-slate-700">
+        <h1 class="text-xl font-bold text-blue-400 mb-2 text-center">Extractor Nomor Ridho</h1>
+        <p class="text-[10px] text-slate-400 mb-6 text-center">Tempel data Excel campuran, hasil otomatis jadi daftar nomor kebawah.</p>
+        
+        <textarea id="inputData" class="w-full h-80 bg-slate-900 border border-slate-700 rounded-xl p-4 text-green-400 text-xs mb-4 outline-none focus:border-blue-500" placeholder="Paste data dari Excel di sini..."></textarea>
+        
+        <button onclick="proses()" class="w-full bg-blue-600 hover:bg-blue-700 py-4 rounded-xl font-bold text-lg shadow-lg active:scale-95 transition-all">
+            DOWNLOAD .TXT
+        </button>
+    </div>
+
+    <script>
+        function proses() {
+            const input = document.getElementById('inputData').value;
+            // Mencari angka 10-15 digit sesuai format nomor di Excel kamu
+            const regex = /\d{10,15}/g;
+            const matches = input.match(regex);
+
+            if (matches) {
+                const unik = [...new Set(matches)]; // Hapus duplikat otomatis
+                const hasil = unik.join('\n'); // Gabungkan jadi baris kebawah
+                
+                const blob = new Blob([hasil], { type: 'text/plain' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = "hasil_nomor.txt";
+                link.click();
+            } else {
+                alert("Nomor tidak ditemukan! Pastikan data yang ditempel benar.");
+            }
+        }
+    </script>
+</body>
+</html>
