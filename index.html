@@ -10,22 +10,34 @@
 <body class="bg-slate-900 text-white min-h-screen p-4 flex flex-col items-center font-sans">
     <div class="max-w-md w-full bg-slate-800 p-6 rounded-3xl shadow-2xl mt-10 border border-slate-700">
         <h1 class="text-4xl font-black text-blue-400 mb-2 text-center italic">Lixie</h1>
-        <p class="text-[10px] text-slate-400 mb-8 text-center uppercase font-bold tracking-widest">Fixer Format Excel Otomatis</p>
+        <p class="text-[10px] text-slate-400 mb-8 text-center uppercase font-bold tracking-widest">Smart Number Extractor</p>
         
         <div class="mb-6">
-            <label class="block text-[11px] font-bold text-slate-400 mb-2 uppercase ml-1">Kirim File Excel Kamu:</label>
+            <label class="block text-[11px] font-bold text-slate-400 mb-2 uppercase ml-1">Kirim File Excel:</label>
             <input type="file" id="excelInput" accept=".xlsx, .xls" 
                 class="block w-full text-xs text-slate-500 file:mr-4 file:py-3 file:px-6 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-600 file:text-white hover:file:bg-blue-700 cursor-pointer bg-slate-900 rounded-2xl p-2 border border-slate-700"/>
         </div>
 
-        <textarea id="inputData" class="w-full h-56 bg-slate-900 border border-slate-700 rounded-2xl p-4 text-green-400 text-xs outline-none focus:border-blue-500 transition-all shadow-inner" placeholder="Nomor yang tadinya berantakan akan rapi di sini..."></textarea>
+        <textarea id="inputData" class="w-full h-56 bg-slate-900 border border-slate-700 rounded-2xl p-4 text-green-400 text-xs outline-none focus:border-blue-500 transition-all shadow-inner" placeholder="Paste nomor atau upload file..."></textarea>
         
-        <button onclick="proses()" class="w-full mt-4 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 py-4 rounded-2xl font-black text-lg shadow-lg active:scale-95 transition-all uppercase">
-            Download .TXT
-        </button>
+        <div class="flex gap-2 mt-4">
+            <button onclick="proses()" class="flex-1 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 py-4 rounded-2xl font-black text-lg shadow-lg active:scale-95 transition-all uppercase">
+                Download
+            </button>
+            <button onclick="hapusSemua()" class="w-20 bg-red-600 hover:bg-red-500 py-4 rounded-2xl font-black text-xs shadow-lg active:scale-95 transition-all uppercase">
+                Hapus
+            </button>
+        </div>
     </div>
 
     <script>
+        // Fungsi untuk menghapus semua isi kotak
+        function hapusSemua() {
+            document.getElementById('inputData').value = "";
+            document.getElementById('excelInput').value = "";
+            alert("Kotak sudah bersih!");
+        }
+
         document.getElementById('excelInput').addEventListener('change', function(e) {
             const file = e.target.files[0];
             const reader = new FileReader();
@@ -34,16 +46,15 @@
                 const workbook = XLSX.read(data, {type: 'array'});
                 const sheet = workbook.Sheets[workbook.SheetNames[0]];
                 
-                // INI KUNCINYA: Memaksa Excel merubah format 'E+12' jadi angka asli
+                // Membaca data apa adanya (menghindari format ilmiah E+12)
                 const jsonData = XLSX.utils.sheet_to_json(sheet, {raw: false});
                 const allText = JSON.stringify(jsonData);
                 
-                // Cari angka 10-15 digit
                 const matches = allText.match(/\d{10,15}/g);
                 if (matches) {
                     document.getElementById('inputData').value = [...new Set(matches)].join('\n');
                 } else {
-                    alert("Tetap tidak ditemukan. Coba cek isi Excelnya lagi.");
+                    alert("Nomor tidak ditemukan!");
                 }
             };
             reader.readAsArrayBuffer(file);
@@ -55,9 +66,9 @@
                 const blob = new Blob([content], { type: 'text/plain' });
                 const link = document.createElement('a');
                 link.href = URL.createObjectURL(blob);
-                link.download = "Lixie_Hasil_Rapi.txt";
+                link.download = "Lixie_Hasil.txt";
                 link.click();
-            } else { alert("Kosong, Dho!"); }
+            } else { alert("Kotak masih kosong!"); }
         }
     </script>
 </body>
